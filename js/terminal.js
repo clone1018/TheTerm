@@ -1,20 +1,4 @@
-/*
-Copyright 2011 Google Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-		 http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-Author: Eric Bidelman (ericbidelman@chromium.org)
-*/
+var start = Date.now();
 
 var util = util || {};
 util.toArray = function(list) {
@@ -90,12 +74,15 @@ var Terminal = Terminal || function(containerId) {
 	window.requestFileSystem = window.requestFileSystem ||
 														 window.webkitRequestFileSystem;
 
-	const VERSION_ = '1.0.9';
+	const VERSION_ = '1.1.0';
 	const CMDS_ = [
 		'cat', 'cd', 'cp', 'clear', 'date', 'echo', 'help', 'install', 'js', 'ls', 'mkdir',
-		'mv', 'open', 'pwd', 'rm', 'rmdir', 'theme', 'version', 'who', 'whoami', 'wget'
+		'mv', 'open', 'play', 'pwd', 'rm', 'rmdir', 'theme', 'version', 'whoami', 'wget'
 	];
 	const THEMES_ = ['default', 'cream'];
+
+	var user = 'root';
+	var hostname = 'localhost';
 
 	var fs_ = null;
 	var cwd_ = null;
@@ -128,7 +115,7 @@ var Terminal = Terminal || function(containerId) {
 	container_.insertAdjacentHTML('beforeEnd',
 			['<output></output>',
 			 '<div id="input-line" class="input-line">',
-			 '<div class="prompt">clone1018@pandora:~#</div><div><input class="cmdline" id="input" autofocus autocomplete="off" spellcheck="false"></div>',
+			 '<div class="prompt">'+ user +'@'+hostname+':~#</div><div><input class="cmdline" id="input" autofocus autocomplete="off" spellcheck="false"></div>',
 			 '</div>'].join(''));
 	var cmdLine_ = container_.querySelector('#input-line .cmdline');
 	var output_ = container_.querySelector('output');
@@ -174,13 +161,27 @@ var Terminal = Terminal || function(containerId) {
 		return "Don't leave me!";
 	}, false);*/
 
-	function tabComplete_(value) {
+	function commandComplete_(value) {
 		CMDS_.sort();
 		for (x in CMDS_) {
 			if(~CMDS_[x].indexOf(value) == -1){
 				return CMDS_[x];
 			}
 		}
+	}
+	function fileComplete_(value) {
+		ls_(function(entries) {
+			if (entries.length) {
+				var html = formatColumns_(entries);
+				util.toArray(entries).forEach(function(entry, i) {
+					if(~entry.name.indexOf(value) == -1){
+						output(value);
+						output(entry.name);
+						return entry.name;
+					}
+				});
+			}
+		});
 	}
 
 	function inputTextClick_(e) {
@@ -199,16 +200,26 @@ var Terminal = Terminal || function(containerId) {
 		}
 
 		if ((e.ctrlKey || e.metaKey) && e.keyCode == 67) {
-			document.getElementById("input").value = "";
+			this.value = "";
 
 			e.preventDefault();
 			e.stopPropagation();
 		}
 
 		if (e.keyCode == 9) {
-			if(tabComplete_(this.value)) {
-				this.value = tabComplete_(this.value);
+			var command = this.value.substr(this.value.indexOf(" ") + 1);
+			var file = this.value.substr(this.value.indexOf(" ") + 1);
+
+			if(commandComplete_(this.value)) {
+				this.value = commandComplete_(this.value);
+				var cmmd = commandComplete_(this.value);
 			}
+			if(commandComplete_(this.value) && fileComplete_(newvalue)) {
+				//this.value = fileComplete_(newvalue);
+				this.value = commandComplete_(this.value) + " " + fileComplete_(newvalue);
+			}
+
+			
 
 			e.preventDefault();
 			e.stopPropagation();
@@ -307,6 +318,24 @@ var Terminal = Terminal || function(containerId) {
 						output(e);
 						break; 
 					} 
+					break;
+				case 'whoami': 
+					output(user);
+					break;
+				case 'play':
+					var music = new Sound(false);
+					var fileName = args.join(' ');
+
+					if (!fileName) {
+						output('usage: ' + cmd + ' filename');
+						break;
+					}
+
+					open_(cmd, fileName, function(fileEntry) {
+						music.load(fileEntry.toURL(), false);
+						music.play();
+					});
+
 					break;
 				case '3d':
 					clear_(this);
@@ -600,10 +629,6 @@ var Terminal = Terminal || function(containerId) {
 					xhr.open('GET', url, true);
 					xhr.send();
 					break;
-				case 'who':
-					output(document.title +
-								 ' - By: Eric Bidelman &lt;ericbidelman@chromium.org&gt;');
-					break;
 				default:
 					if (cmd) {
 						output(cmd + ': command not found');
@@ -808,9 +833,9 @@ var Terminal = Terminal || function(containerId) {
 
 	return {
 		initFS: function(persistent, size) {
-			output('<div>Welcome to The Term! (v' + VERSION_ + ')</div>');
-			output((new Date()).toLocaleString());
-			output('<p>Documentation: type "help"</p>');
+			output('<div>Welcome to <strong>The Term</strong>! (v' + VERSION_ + ')</div>');
+			output('<strong>News:</strong> Tab completion now semi works!<br>');
+			output('<strong>Documentation:</strong> type "help"<br><br>');
 
 			if (!!!window.requestFileSystem) {
 				output('<div>Sorry! The FileSystem APIs are not available in your browser.</div>');
@@ -862,3 +887,4 @@ var Terminal = Terminal || function(containerId) {
 	}
 };
 
+console.log("Page load took " + (Date.now() - start) + "milliseconds");

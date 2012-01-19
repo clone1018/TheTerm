@@ -1,8 +1,17 @@
-HTML5 Terminal
+The Term
 Command-line terminal emulator running on top of HTML5 APIs.
 
-Author: Eric Bidelman <ericbidelman@chromium.org>
+Author: clone1018
+Old Code By: Eric Bidelman <ericbidelman@chromium.org>
 ================================================================================
+
+Core Features: 
+- File System
+- Tab Completion
+- wget Support
+
+Coming Soon: 
+- Full Audio Playback Support (play file.mp3)
 
 HTML5 APIs:
 - FileSystem API
