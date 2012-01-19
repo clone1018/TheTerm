@@ -164,7 +164,7 @@ body {
 .dim > * {
 	opacity: 0.4;
 }
-.dim .help {
+.dim .video {
 	opacity: 1;
 }
 iframe#fsn {
@@ -288,6 +288,61 @@ button:not([disabled]):active {
 button[disabled] {
 	color: #ccc;
 }
+
+.video {
+  font-family: 'Droid Sans', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  display: -webkit-box;
+  -webkit-box-align: center;
+  -webkit-box-pack: center;
+  -webkit-box-orient: vertical;
+  -webkit-user-select: none;
+  user-select: none;
+  font-size: 10pt;
+}
+.video,
+.video > section {
+  border-radius: 10px;
+}
+.video > section {
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.3);
+  -webkit-box-shadow: 3px 3px 5px rgba(0,0,0,0.6);
+  border-radius: 10px;
+  color: white;
+  position: relative;
+  width: 680px;
+}
+.video > section > div {
+  background: rgba(0, 0, 0, 1);
+  padding: 20px;
+}
+.video h2 {
+  padding-bottom: 8px;
+  margin-top: 0;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #fff;
+  color: #ffcc00;
+}
+.video p strong {
+  width: 60px;
+  display: inline-block;
+}
+.video #close:active {
+  right: 19px;
+  top: 21px;
+}
+.video .shortcuts {
+  -webkit-columns: 2;
+  columns: 2;
+}
+
 
 /* Themes */
 .cream {

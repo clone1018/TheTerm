@@ -6,6 +6,9 @@
 		<meta http-equiv="X-UA-Compatible" content="chrome=1">
 		<title>The Term</title>
 		<link href='http://fonts.googleapis.com/css?family=Droid+Sans|Droid+Sans+Mono' rel='stylesheet' type='text/css'>
+		<link href="http://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
+		<script src="http://vjs.zencdn.net/c/video.js"></script>
+
 		<link rel="stylesheet" media="all" href="/css/terminal.css">
 		<link rel="chrome-application-definition" href="manifest.json">
 	</head>
@@ -16,10 +19,18 @@
 		<div id="container"></div>
 		<!--<div class="crt bottom"></div>-->
 
+		<aside class="video hidden">
+		  <section>
+			<video id="my_video_1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" data-setup="{}">
+			
+			</video>
+		  </section>
+		</aside>
+
 		<script src="/js/terminal.js"></script>
 		<script>
-		function toggleHelp() {
-			document.querySelector('.help').classList.toggle('hidden');
+		function toggleMedia() {
+			document.querySelector('.video').classList.toggle('hidden');
 			document.body.classList.toggle('dim');
 		}
 
@@ -36,7 +47,7 @@
 
 			document.body.addEventListener('keydown', function(e) {
 				if (e.keyCode == 27) { // Esc
-					toggleHelp();
+					toggleMedia();
 					e.stopPropagation();
 					e.preventDefault();
 				}

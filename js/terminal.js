@@ -74,7 +74,7 @@ var Terminal = Terminal || function(containerId) {
 	window.requestFileSystem = window.requestFileSystem ||
 														 window.webkitRequestFileSystem;
 
-	const VERSION_ = '1.1.0';
+	const VERSION_ = '1.1.1';
 	const CMDS_ = [
 		'cat', 'cd', 'cp', 'clear', 'date', 'echo', 'help', 'install', 'js', 'ls', 'mkdir',
 		'mv', 'open', 'play', 'pwd', 'rm', 'rmdir', 'theme', 'version', 'whoami', 'wget'
@@ -323,17 +323,14 @@ var Terminal = Terminal || function(containerId) {
 					output(user);
 					break;
 				case 'play':
-					var music = new Sound(false);
 					var fileName = args.join(' ');
 
 					if (!fileName) {
 						output('usage: ' + cmd + ' filename');
 						break;
 					}
-
 					open_(cmd, fileName, function(fileEntry) {
-						music.load(fileEntry.toURL(), false);
-						music.play();
+						mediaPlayer_("my_video_1_html5_api", fileEntry.toURL());					
 					});
 
 					break;
@@ -823,6 +820,25 @@ var Terminal = Terminal || function(containerId) {
 			body.removeChild(fsn_);
 			fsn_ = null;
 		}
+	}
+
+	function mediaPlayer_(div, src) {
+		var myPlayer = _V_(div);
+		var type = 'video/ogg';
+		if(~src.toString().indexOf('ogv') == -1)
+			type = 'video/ogg';
+		if(~src.toString().indexOf('mp4') == -1)
+			type = 'video/mp4';
+		if(~src.toString().indexOf('mp3') == -1)
+			type = 'video/mpeg';
+		toggleMedia();
+
+		document.getElementById(div).innerHTML = "<source src=\""+src.toString()+"\" type=\""+type+"\">";
+
+		var ended = function(){
+			toggleMedia();
+		};
+		myPlayer.addEvent("ended", ended);
 	}
 
 	function output(html) {
